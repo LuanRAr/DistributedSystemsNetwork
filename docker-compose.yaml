@@ -1,0 +1,14 @@
+services:
+  meu-server:
+    build: serverFolder
+    ports:
+      - "8080:8080"
+
+  
+  client-server:
+    build: clienteFolder
+    depends_on:
+      - meu-server
+    
+    stdin_open: true
+    tty: true

@@ -7,7 +7,7 @@ import (
 )
 
 func main(){
-	conectServer, error1 := net.Dial("tcp", ":8080")
+	conectServer, error1 := net.Dial("tcp", "meu-server:8080")
 	if error1 != nil{
 		fmt.Println(error1)
 		return
