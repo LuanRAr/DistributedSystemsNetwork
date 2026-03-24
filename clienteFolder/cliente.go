@@ -6,7 +6,7 @@ import (
 	"bufio"
 )
 
-func main(){
+func maoin(){
 	conectServer, error1 := net.Dial("tcp", "meu-server:8080")
 	if error1 != nil{
 		fmt.Println(error1)
