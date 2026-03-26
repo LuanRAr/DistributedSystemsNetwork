@@ -1,25 +1,22 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
-	"encoding/json"
+	"sync"
 )
 
+//TCP--------------------------------
 type UserInput struct {
-	Option int `json:"option"`
+	Option int 
 }
 
 type Menu struct {
-	Texto string `json:"menu"`
+	Texto string 
 }
 
-func main(){
-	serverTCP()
-
-}
-
-//UDP
+//UDP-------------------------------
 type Coords struct{
 	Latitude float32  
 	Longitude float32 
@@ -29,6 +26,21 @@ type Object struct{
 	Name string
 	Coordinates []Coords
 	Doors string
+}
+
+type MemoriaSensor struct {
+	sync.Mutex
+	verDados Object
+}
+
+//globais------------------------------
+var currentStatus MemoriaSensor
+
+//SERVER-------------------------------------------------------------------------------------------------------------
+func main(){
+	go serverUDP()
+	serverTCP()
+	
 }
 
 //Servidor TCP----------------------------------------------------------------------------
@@ -91,25 +103,26 @@ func handleConnection(conn net.Conn){
 
 //Servidor UDP----------------------------------------------------------------------------
 func serverUDP(){
-	addr, err := net.ResolveUDPAddr("udp", ":8081")
+	addr, err := net.ResolveUDPAddr("udp", ":4042")
 	if err != nil {
 		fmt.Println("Erro", err)
 		return
 	}
 
 	conn, err2 := net.ListenUDP("udp", addr)
-	if err != nil{
+	if err2 != nil{
 		fmt.Println("Erro: ", err2)
 	}
 
 	defer conn.Close()
+	
+	//mensagem que usuario passou em pacote
+	buffer := make([]byte, 1024)
 
 	for {
-		//mensagem que usuario passou em pacote
-		buffer := make([]byte, 1024)
 
 		//ler os dados
-		n, _, err3 := conn.ReadFromUDP(buffer)
+		n, remoteAddr, err3 := conn.ReadFromUDP(buffer)
 		if err3 != nil{
 			fmt.Println("Erro: ", err3)
 			continue
@@ -122,5 +135,23 @@ func serverUDP(){
 			continue
 		}
 
+		currentStatus.Lock()
+		currentStatus.verDados = sensor
+		currentStatus.Unlock()
+
+		handleConnectionUDP(remoteAddr, conn, buffer[:n])
+	}
+	
+}
+
+func handleConnectionUDP( remoteAddr *net.UDPAddr, conn *net.UDPConn, data []byte){
+	
+	fmt.Printf("%v: %s\n", remoteAddr, string(data))
+	//mensagem respondendo cliente
+	message := "Mensagem recebida!"
+
+	_, err2 := conn.WriteToUDP([]byte(message), remoteAddr)
+	if err2 != nil{
+		fmt.Println("A mensagem não foi enviada de volta: ", err2)
 	}
 }

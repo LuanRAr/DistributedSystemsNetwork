@@ -25,22 +25,23 @@ type Object struct{
 
 func main(){
 	//prepara a porta 4041 para uso em conexão UDP
-	addr, err := net.ResolveUDPAddr("udp", ":4041")
+	addr, err := net.ResolveUDPAddr("udp", ":4042")
 	if err != nil {
 		fmt.Println("Erro: ", err)
 		return
 	}
 
-	// loop
-	for {
-		conn, err2 := net.DialUDP("udp", nil, addr)
+	conn, err2 := net.DialUDP("udp", nil, addr)
 		if err2 != nil{
 			fmt.Println("Erro: ", err2)
 			return
 		}
-
 		//fechar conexão
 		defer conn.Close()
+
+
+	// loop
+	for {
 
 		//mensagem para enviar pro servidor
 		message, err3 := json.Marshal(objectData(-40, 40))
@@ -53,11 +54,10 @@ func main(){
 		conn.Write(message)
 		fmt.Println("Mensagem enviada")
 
-		//delay de 5 segundos para enviar outro
+		//delay de 3 segundos para enviar outro
 		time.Sleep(time.Second * 3)
 		
 	}
-
 
 }
 
