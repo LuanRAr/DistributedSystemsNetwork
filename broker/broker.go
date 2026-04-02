@@ -18,8 +18,8 @@ type Menu struct {
 
 //UDP-------------------------------
 type Coords struct{
-	Latitude float32  
-	Longitude float32 
+	Latitude string
+	Longitude string 
 }
 
 type Object struct{
@@ -36,7 +36,7 @@ type MemoriaSensor struct {
 //globais------------------------------
 var currentStatus MemoriaSensor
 
-//SERVER-------------------------------------------------------------------------------------------------------------
+//SERVER----------------------------------------------------------------------------------
 func main(){
 	go serverUDP()
 	serverTCP()
