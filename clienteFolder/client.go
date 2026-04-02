@@ -43,12 +43,59 @@ func main(){
 	resposta := UserInput{
 		Option: escolha,
 	}
+
+	//Enviar resposta
+	encoder := json.NewEncoder(conn)
 	
-	err4 := json.NewEncoder(conn).Encode(resposta)
+	err4 := encoder.Encode(resposta)
 	if err4 != nil{
 		println("Erro: ", err4)
 		return
 	} 
+
+	//Receber a resposta do Broker sobre a opção escolhida
+	var respostaBroker Menu
+	err5 := json.NewDecoder(conn).Decode(&respostaBroker)
+	if err5 != nil {
+		fmt.Println("Erro ao receber resposta do Broker:", err5)
+		return
+	}
+
+	fmt.Print(respostaBroker)
+
+	//Cliente escolhe sensor para ver
+	var chooseSensor int
+	_, err6 := fmt.Scan(&chooseSensor)
+	if err6 != nil{
+		println("Erro: ", err4)
+	}
+
+	resposta2 := UserInput{
+		Option: chooseSensor,
+	}
+
+	encoder.Encode(resposta2)
+    
+    //Envia a escolha do sensor específico para o servidor
+    errEnvia := json.NewEncoder(conn).Encode(resposta2)
+    if errEnvia != nil {
+        fmt.Println("Erro ao enviar escolha:", errEnvia)
+        return
+    }
+
+    //Recebe os detalhes do sensor escolhido
+    var detalhesSensor Menu
+    errFinal := json.NewDecoder(conn).Decode(&detalhesSensor)
+    if errFinal != nil {
+        fmt.Println("Erro ao receber detalhes:", errFinal)
+        return
+    }
+
+    // Exibe os detalhes na tela
+    fmt.Println(detalhesSensor.Texto)
+
+
+
 
 }
 

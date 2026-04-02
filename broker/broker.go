@@ -90,7 +90,7 @@ func handleConnectionTCP(conn net.Conn){
 
 	switch input.Option {
 		case 1:
-        //Mostra a lista (Sua função atual)
+        //Mostra a lista
         showMenu(encoder)
         
         //Pergunta qual sensor ele quer ver
