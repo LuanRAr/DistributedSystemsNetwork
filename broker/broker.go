@@ -13,7 +13,7 @@ type UserInput struct {
 }
 
 type Menu struct {
-	Texto string 
+	Texto string `json:"menu"`
 }
 
 //UDP-------------------------------
@@ -30,7 +30,7 @@ type Object struct{
 
 type MemoriaSensor struct {
 	sync.Mutex
-	verDados Object
+	verDados []Object
 }
 
 //globais------------------------------
@@ -42,7 +42,6 @@ func main(){
 	serverTCP()
 	
 }
-
 //Servidor TCP----------------------------------------------------------------------------
 func serverTCP(){
 	server, err := net.Listen("tcp", ":4041")
@@ -60,12 +59,12 @@ func serverTCP(){
 			continue
 		}
 
-		go handleConnection(conn)
+		go handleConnectionTCP(conn)
 	}
 
 }
 
-func handleConnection(conn net.Conn){
+func handleConnectionTCP(conn net.Conn){
 	defer conn.Close()
 
 	fmt.Println("Nova conexão de ", conn.RemoteAddr())
@@ -91,13 +90,36 @@ func handleConnection(conn net.Conn){
 
 	switch input.Option {
 		case 1:
-			fmt.Println("Usuário escolheu 1")
+			showMenu(encoder)
+			
 		case 2: 
-			fmt.Println("Usuário escolheu 2")
+			showMenu(encoder)
 		default:
-			fmt.Println("Default")
-
+			break
 	}
+
+}
+
+func showMenu(encoder *json.Encoder){
+	currentStatus.Lock()
+
+	var resposta Menu
+
+	if len(currentStatus.verDados) == 0 {
+		resposta.Texto = "Sem sensores ativos no momento"
+	} else {
+		texto := "----Sensores ativos----\n"	
+
+		for i, v := range currentStatus.verDados {
+			texto += fmt.Sprintf("%d: %s\n", i+1, v.Name)
+		}
+
+		resposta.Texto = texto
+	}
+
+	encoder.Encode(resposta)
+
+	currentStatus.Unlock()
 
 }
 
@@ -115,12 +137,11 @@ func serverUDP(){
 	}
 
 	defer conn.Close()
-	
+
 	//mensagem que usuario passou em pacote
 	buffer := make([]byte, 1024)
 
 	for {
-
 		//ler os dados
 		n, remoteAddr, err3 := conn.ReadFromUDP(buffer)
 		if err3 != nil{
@@ -135,8 +156,22 @@ func serverUDP(){
 			continue
 		}
 
+		//adicionar objeto à lista
 		currentStatus.Lock()
-		currentStatus.verDados = sensor
+
+		find := false
+		for i, item := range currentStatus.verDados{
+			if item.Name == sensor.Name {
+				currentStatus.verDados[i] = sensor
+				find = true
+				break 
+			}
+		}
+
+		if !find {
+			currentStatus.verDados = append(currentStatus.verDados, sensor)
+		}
+	
 		currentStatus.Unlock()
 
 		handleConnectionUDP(remoteAddr, conn, buffer[:n])
@@ -144,10 +179,11 @@ func serverUDP(){
 	
 }
 
-func handleConnectionUDP( remoteAddr *net.UDPAddr, conn *net.UDPConn, data []byte){
+func handleConnectionUDP(remoteAddr *net.UDPAddr, conn *net.UDPConn, data []byte){
 	
-	fmt.Printf("%v: %s\n", remoteAddr, string(data))
-	//mensagem respondendo cliente
+	//fmt.Printf("%v: %s\n", remoteAddr, string(data))
+
+	//mensagem respondendo sensor
 	message := "Mensagem recebida!"
 
 	_, err2 := conn.WriteToUDP([]byte(message), remoteAddr)
