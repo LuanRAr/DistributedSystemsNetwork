@@ -90,8 +90,43 @@ func handleConnectionTCP(conn net.Conn){
 
 	switch input.Option {
 		case 1:
-			showMenu(encoder)
-			
+        //Mostra a lista (Sua função atual)
+        showMenu(encoder)
+        
+        //Pergunta qual sensor ele quer ver
+        watchSensor := Menu{Texto: "Digite o número do sensor para ver detalhes:"}
+        encoder.Encode(watchSensor)
+
+        //Recebe a escolha do sensor
+        var input2 UserInput
+        if err := decoder.Decode(&input2); err != nil {
+            fmt.Println("Erro ao ler escolha do sensor:", err)
+            return
+        }
+
+        //Processa a escolha
+        currentStatus.Lock()
+        
+        index := input2.Option - 1
+        
+        var respostaDetalhe Menu
+        if index >= 0 && index < len(currentStatus.verDados) {
+            obj := currentStatus.verDados[index]
+            //Monta uma string com os detalhes do objeto
+            respostaDetalhe.Texto = fmt.Sprintf(
+                "\n--- Detalhes de: %s ---\nCoordenadas: %+v\nPortas: %s\n", 
+                obj.Name, obj.Coordinates, obj.Doors,
+            )
+        } else {
+            respostaDetalhe.Texto = "Sensor inválido ou não encontrado."
+        }
+        
+        currentStatus.Unlock()
+        
+        //Envia os detalhes de volta para o cliente
+        encoder.Encode(respostaDetalhe)
+
+
 		case 2: 
 			showMenu(encoder)
 		default:
@@ -180,8 +215,6 @@ func serverUDP(){
 }
 
 func handleConnectionUDP(remoteAddr *net.UDPAddr, conn *net.UDPConn, data []byte){
-	
-	//fmt.Printf("%v: %s\n", remoteAddr, string(data))
 
 	//mensagem respondendo sensor
 	message := "Mensagem recebida!"
