@@ -18,7 +18,6 @@ type Menu struct {
 
 type Actuator struct {
 	sensor Object
-	 
 }
 
 //UDP-------------------------------
@@ -28,7 +27,7 @@ type Coords struct{
 }
 
 type Object struct{
-	ID string
+	Id string
 	Name string
 	Coordinates []Coords
 	Doors string
@@ -143,10 +142,10 @@ func handleConnectionTCP(conn net.Conn){
 			var clientResponse UserInput
 			decoder.Decode(&clientResponse)
 
-			for i := range currentStatus.verDados{
+			for i, item := range currentStatus.verDados{
 				if i+1 == clientResponse.Option {
-					fmt.Println("TEM UM DESSE, FUNFOU, SACANA!")
-					break 
+					sendActuator(item)
+					fmt.Println("Voce enviou a mensagem pro atuador")
 				} else {
 					fmt.Println("Nao tem")
 				}
@@ -248,8 +247,8 @@ func handleConnectionUDP(remoteAddr *net.UDPAddr, conn *net.UDPConn, data []byte
 }
 
 //Atuador
-func Actuator(){
-	conn, err := net.Dial("tcp", "8983")
+func sendActuator(item Object){
+	conn, err := net.Dial("tcp", ":8983")
 	if err != nil{
 		fmt.Println("Erro:", err)
 		return
@@ -257,8 +256,9 @@ func Actuator(){
 
 	//Enviar resposta
 	encoder := json.NewEncoder(conn)
-	//Receber resposta
-	decoder := json.NewDecoder(conn)
+
+	encoder.Encode(item)
+
 
 
 

@@ -18,6 +18,7 @@ type StatusDoor struct{
 }
 
 type Object struct{
+	Id string
 	Name string
 	Coordinates []Coords
 	Doors string
@@ -69,6 +70,7 @@ func objectData(min float32, max float32) Object{
 	longNumber := fmt.Sprintf("%.2f", randomNumber2)
 
 	object1 := Object {
+		Id: "26182",
 		Name: "Objeto1",
 		Coordinates: []Coords{
 			{
