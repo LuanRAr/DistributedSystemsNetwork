@@ -52,55 +52,58 @@ func main(){
 	//Caso apenas resolva mexer no menu
 	switch escolha {
 		case 1:
-			fmt.Println("escolheu menu")
-			
 			err4 := encoder.Encode(resposta)
-			if err4 != nil{
-				println("Erro: ", err4)
+			if err4 != nil {
+				fmt.Println("Erro: ", err4)
 				return
-			} 
+			}
 
-			//Receber a resposta do Broker sobre a opção escolhida
+			//receber a lista de sensores 
 			var respostaBroker Menu
-			err5 := json.NewDecoder(conn).Decode(&respostaBroker)
+			err5 := decoder.Decode(&respostaBroker)
 			if err5 != nil {
 				fmt.Println("Erro ao receber resposta do Broker:", err5)
 				return
 			}
 
-			fmt.Print(respostaBroker)
+			fmt.Println(respostaBroker.Texto)
 
-			//Cliente escolhe sensor para ver
+			//receber a pergunta: "Digite o número do sensor para ver detalhes:"
+			var perguntaSensor Menu
+			errPergunta := decoder.Decode(&perguntaSensor)
+			if errPergunta == nil {
+				fmt.Print(perguntaSensor.Texto)
+			}
+
+			//cliente escolhe o sensor para ver
 			var chooseSensor int
 			_, err6 := fmt.Scan(&chooseSensor)
-			if err6 != nil{
-				println("Erro: ", err4)
+			if err6 != nil {
+				fmt.Println("Erro no Scan: ", err6)
 			}
 
 			resposta2 := UserInput{
 				Option: chooseSensor,
 			}
-
-			encoder.Encode(resposta2)
 			
-			//Envia a escolha do sensor específico para o servidor
-			errEnvia := json.NewEncoder(conn).Encode(resposta2)
+			//enviar a escolha do sensor específico para o servidor
+			errEnvia := encoder.Encode(resposta2)
 			if errEnvia != nil {
 				fmt.Println("Erro ao enviar escolha:", errEnvia)
 				return
 			}
 
-			//Recebe os detalhes do sensor escolhido
+			//recebe os detalhes do sensor escolhido
 			var detalhesSensor Menu
-			errFinal := json.NewDecoder(conn).Decode(&detalhesSensor)
+			errFinal := decoder.Decode(&detalhesSensor)
 			if errFinal != nil {
 				fmt.Println("Erro ao receber detalhes:", errFinal)
 				return
 			}
 
-			// Exibe os detalhes na tela
+			//exibe os detalhes na tela
 			fmt.Println(detalhesSensor.Texto)
-		
+
 		case 2:
 			err4 := encoder.Encode(resposta)
 			if err4 != nil {
@@ -108,17 +111,17 @@ func main(){
 				return
 			}
 
-			// 2. AGORA SIM O BROKER ENVIA A LISTA (showMenu)
+			//broker envia a lista
 			var choose Menu
 			decoder.Decode(&choose)
 			fmt.Println(choose.Texto)
 
-			// 3. O BROKER ENVIA A PERGUNTA (questionActuator)
+			// broker envia a pergunta
 			var choose2 Menu
 			decoder.Decode(&choose2)
 			fmt.Println(choose2.Texto)
 
-			// 4. ESCOLHER QUAL OBJETO ATUAR
+			//escolhe qual porta abrir
 			var chooseDoor int
 			_, errchooseDoor := fmt.Scan(&chooseDoor)
 			if errchooseDoor != nil {
@@ -129,7 +132,7 @@ func main(){
 				Option: chooseDoor,
 			}
 
-			// 5. ENVIA A RESPOSTA FINAL PARA O BROKER
+			//resposta final para o broker
 			encoder.Encode(respostaAtuador)
 
 			}

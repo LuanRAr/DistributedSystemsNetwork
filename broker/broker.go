@@ -259,11 +259,4 @@ func sendActuator(item Object){
 
 	encoder.Encode(item)
 
-
-
-
-
-
-
-
 }
