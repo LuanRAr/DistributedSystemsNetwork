@@ -93,10 +93,4 @@ func main(){
 
     // Exibe os detalhes na tela
     fmt.Println(detalhesSensor.Texto)
-
-
-
-
 }
-
-
