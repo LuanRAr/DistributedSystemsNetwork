@@ -6,7 +6,7 @@ import (
 )
 
 func actuator(){
-	server, err := net.Listen("tcp", ":4041")
+	server, err := net.Listen("tcp", ":8983")
 	if err != nil {
 		fmt.Println("Erro: ", err)
 		return

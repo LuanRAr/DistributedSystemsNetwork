@@ -16,6 +16,11 @@ type Menu struct {
 	Texto string `json:"menu"`
 }
 
+type Actuator struct {
+	sensor Object
+	 
+}
+
 //UDP-------------------------------
 type Coords struct{
 	Latitude string
@@ -23,6 +28,7 @@ type Coords struct{
 }
 
 type Object struct{
+	ID string
 	Name string
 	Coordinates []Coords
 	Doors string
@@ -116,7 +122,7 @@ func handleConnectionTCP(conn net.Conn){
 					obj.Name, obj.Coordinates, obj.Doors,
 				)
 			} else {
-				respostaDetalhe.Texto = "Sensor inválido ou não encontrado."
+				respostaDetalhe.Texto = "\nSensor inválido ou não encontrado."
 			}
 			currentStatus.Unlock()
 			
@@ -124,18 +130,32 @@ func handleConnectionTCP(conn net.Conn){
 			encoder.Encode(respostaDetalhe)
 
 		case 2: 
+			//Mostra os sensores ativos
 			showMenu(encoder)
 			
+			//Escolhe qual porta vai fechar
 			questionActuator := Menu {
-				Texto: "\nDigite o número do objeto que você deseja acionar o fechamento da porta:\n",
+				Texto: "Digite o número do objeto que você deseja acionar o fechamento da porta:",
+			}
+			encoder.Encode(questionActuator)
+
+			//Resposta do cliente
+			var clientResponse UserInput
+			decoder.Decode(&clientResponse)
+
+			for i := range currentStatus.verDados{
+				if i+1 == clientResponse.Option {
+					fmt.Println("TEM UM DESSE, FUNFOU, SACANA!")
+					break 
+				} else {
+					fmt.Println("Nao tem")
+				}
 			}
 
-			encoder.Encode(questionActuator)
-			
+
 		default:
 			break
 	}
-
 }
 
 func showMenu(encoder *json.Encoder){
@@ -158,7 +178,6 @@ func showMenu(encoder *json.Encoder){
 	encoder.Encode(resposta)
 
 	currentStatus.Unlock()
-
 }
 
 //Servidor UDP----------------------------------------------------------------------------
@@ -226,4 +245,25 @@ func handleConnectionUDP(remoteAddr *net.UDPAddr, conn *net.UDPConn, data []byte
 	if err2 != nil{
 		fmt.Println("A mensagem não foi enviada de volta: ", err2)
 	}
+}
+
+//Atuador
+func Actuator(){
+	conn, err := net.Dial("tcp", "8983")
+	if err != nil{
+		fmt.Println("Erro:", err)
+		return
+	}
+
+	//Enviar resposta
+	encoder := json.NewEncoder(conn)
+	//Receber resposta
+	decoder := json.NewDecoder(conn)
+
+
+
+
+
+
+
 }
