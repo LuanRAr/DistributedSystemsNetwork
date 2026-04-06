@@ -1,0 +1,7 @@
+FROM golang:1.23-alpine
+WORKDIR /app
+COPY . .
+RUN go build -o atuador actuator.go
+#expõe a porta que o atuador ouve
+EXPOSE 8983/tcp
+CMD ["./atuador"]

@@ -1,6 +1,7 @@
 FROM golang:1.23-alpine
 WORKDIR /app
 COPY . .
-# Aqui ele compila o broker.go
-RUN go build -o main cliente.go
-CMD ["./main"]
+#compila o cliente
+RUN go build -o cliente client.go
+#terminal interativo, -it 
+CMD ["./cliente"]
