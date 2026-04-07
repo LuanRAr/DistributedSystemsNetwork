@@ -162,6 +162,7 @@ func handleConnectionTCP(conn net.Conn){
 
 func showMenu(encoder *json.Encoder){
 	currentStatus.Lock()
+	defer currentStatus.Unlock()
 
 	var resposta Menu
 
@@ -178,8 +179,6 @@ func showMenu(encoder *json.Encoder){
 	}
 
 	encoder.Encode(resposta)
-
-	currentStatus.Unlock()
 }
 
 //Servidor UDP----------------------------------------------------------------------------
