@@ -13,10 +13,6 @@ type Coords struct{
 	Longitude string
 }
 
-type StatusDoor struct{
-	StatusDoor []string
-}
-
 type Object struct{
 	Id string
 	Name string
@@ -62,7 +58,7 @@ func main(){
 
 func objectData(min float32, max float32) Object{
 
-	//fórmula aplicada:
+	//fórmula para numeros aleatórios:
 	randomNumber := min + rand.Float32()*(max-min) / 100
 	randomNumber2 := min + rand.Float32()*(max-min) / 100
 

@@ -9,12 +9,8 @@ import(
 )
 
 type Coords struct{
-	Latitude float32  
-	Longitude float32 
-}
-
-type StatusDoor struct{
-	StatusDoor []string
+	Latitude string 
+	Longitude string
 }
 
 type Object struct{
@@ -63,16 +59,19 @@ func main(){
 
 func objectData(min float32, max float32) Object{
 
-	//fórmula aplicada:
-	randomNumber := min + rand.Float32()*(max-min)
-	randomNumber2 := min + rand.Float32()*(max-min)
+	//fórmula para numeros aleatórios:
+	randomNumber := min + rand.Float32()*(max-min) / 100
+	randomNumber2 := min + rand.Float32()*(max-min) / 100
+
+	latNumber := fmt.Sprintf("%.2f", randomNumber)
+	longNumber := fmt.Sprintf("%.2f", randomNumber2)
 
 	object1 := Object {
 		Name: "SENSOR2",
 		Coordinates: []Coords{
 			{
-			Latitude: randomNumber,
-			Longitude: randomNumber2,
+			Latitude: latNumber,
+			Longitude: longNumber,
 			},
 		},
 		Doors: "Fechada",

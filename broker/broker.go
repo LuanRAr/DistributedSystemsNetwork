@@ -95,21 +95,21 @@ func handleConnectionTCP(conn net.Conn){
 
 	switch input.Option {
 		case 1:
-			// envia a lista (showMenu já faz o Encode da lista)
+			//envia a lista
 			showMenu(encoder)
 			
-			// envia a PERGUNTA como uma nova mensagem JSON
+			//envia a PERGUNTA como uma nova mensagem JSON
 			watchSensor := Menu{Texto: "Digite o número do sensor para ver detalhes:"}
 			encoder.Encode(watchSensor)
 
-			// recebe a escolha do sensor específica deste menu
+			//recebe a escolha do sensor específica deste menu
 			var input2 UserInput
 			if err := decoder.Decode(&input2); err != nil {
 				fmt.Println("Erro ao ler escolha do sensor:", err)
 				return
 			}
 
-			// processa a escolha com Lock para segurança
+			//processa a escolha com Lock para segurança
 			currentStatus.Lock()
 			index := input2.Option - 1
 			
@@ -125,7 +125,7 @@ func handleConnectionTCP(conn net.Conn){
 			}
 			currentStatus.Unlock()
 			
-			// envia o resultado final
+			//envia o resultado final
 			encoder.Encode(respostaDetalhe)
 
 		case 2: 
@@ -142,6 +142,8 @@ func handleConnectionTCP(conn net.Conn){
 			var clientResponse UserInput
 			decoder.Decode(&clientResponse)
 
+			currentStatus.Lock()
+
 			for i, item := range currentStatus.verDados{
 				if i+1 == clientResponse.Option {
 					sendActuator(item)
@@ -151,6 +153,7 @@ func handleConnectionTCP(conn net.Conn){
 				}
 			}
 
+			currentStatus.Unlock()
 
 		default:
 			break
@@ -253,6 +256,8 @@ func sendActuator(item Object){
 		fmt.Println("Erro:", err)
 		return
 	}
+
+	defer conn.Close()
 
 	//Enviar resposta
 	encoder := json.NewEncoder(conn)
