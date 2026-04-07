@@ -1,0 +1,7 @@
+services:
+  broker:
+    build: 
+      context: ./broker
+      dockerfile: dockerfile
+    network_mode: "host"
+    restart: always

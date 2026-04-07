@@ -1,0 +1,8 @@
+services:
+  cliente:
+    build: 
+      context: ./clienteFolder
+      dockerfile: dockerfile
+    network_mode: "host"
+    stdin_open: true
+    tty: true

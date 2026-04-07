@@ -1,0 +1,18 @@
+services:
+  sensor1:
+    build: 
+      context: ./sensor1
+      dockerfile: dockerfile
+    network_mode: "host"
+
+  sensor2:
+    build: 
+      context: ./sensor2
+      dockerfile: dockerfile
+    network_mode: "host"
+
+  atuador:
+    build: 
+      context: ./actuator
+      dockerfile: dockerfile
+    network_mode: "host"
