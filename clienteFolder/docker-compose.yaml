@@ -1,8 +1,10 @@
+version: "3.9"
+
 services:
-  cliente:
-    build: 
-      context: ./clienteFolder
-      dockerfile: dockerfile
-    network_mode: "host"
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: iot_client
     stdin_open: true
     tty: true

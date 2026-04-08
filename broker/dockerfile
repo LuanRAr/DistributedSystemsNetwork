@@ -1,9 +1,19 @@
-FROM golang:1.23-alpine
-WORKDIR /app
-COPY . .
-RUN go build -o broker broker.go
+# imagem base
+FROM golang:1.22-alpine
 
-#expõe as portas que o broker utiliza
+#diretório de trabalho
+WORKDIR /app
+
+#copiar arquivos
+COPY . .
+
+#compilar o binário
+RUN go build -o server main.go
+
+#expor portas TCP e UDP
 EXPOSE 4041/tcp
 EXPOSE 4042/udp
-CMD ["./broker"]
+EXPOSE 8983/tcp
+
+#rodar aplicação
+CMD ["./server"]

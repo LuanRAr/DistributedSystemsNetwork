@@ -1,14 +1,11 @@
-services:
-  sensor-objeto-1:
-    build: 
-      context: ./sensor1
-      dockerfile: dockerfile
-    network_mode: "host" # Usa o IP real da máquina para alcançar o Broker
-    restart: on-failure
+version: "3.9"
 
-  sensor-objeto-2:
-    build: 
-      context: ./sensor2
-      dockerfile: dockerfile
-    network_mode: "host" # Garante que o tráfego UDP saia pela placa de rede física
-    restart: on-failure
+services:
+  sensor:
+    build:
+      context: .
+      dockerfile: Dockerfile.sensor
+    container_name: iot_sensor
+    environment:
+      - SERVER_IP=192.168.0.10
+    restart: always

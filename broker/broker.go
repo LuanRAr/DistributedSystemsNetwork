@@ -99,10 +99,10 @@ func handleConnectionTCP(conn net.Conn){
 	switch input.Option {
 		case 1:
 			//envia a lista
-			showMenu(encoder)
+			showSensors(encoder)
 			
 			//envia a pergunta como uma nova mensagem JSON
-			watchSensor := Menu{Texto: "Digite o número do sensor para ver detalhes:"}
+			watchSensor := Menu{Texto: "Digite o número do sensor para ver detalhes:\n"}
 			encoder.Encode(watchSensor)
 
 			//recebe a escolha do sensor específica deste menu
@@ -119,10 +119,15 @@ func handleConnectionTCP(conn net.Conn){
 			var respostaDetalhe Menu
 			if index >= 0 && index < len(currentStatus.verDados) {
 				obj := currentStatus.verDados[index]
-				respostaDetalhe.Texto = fmt.Sprintf(
-					"\n--- Detalhes de: %s ---\nCoordenadas: %+v\nPortas: %s\n", 
-					obj.Name, obj.Coordinates, obj.Door,
+				respostaDetalhe.Texto = fmt.Sprintf (
+					"📍 [%s] %s | 🌐 (%s, %s) | 🚪 %s\n",
+					obj.Id,
+					obj.Name,
+					obj.Coordinates[0].Latitude,
+					obj.Coordinates[0].Longitude,
+					obj.Door,
 				)
+
 			} else {
 				respostaDetalhe.Texto = "\nSensor inválido ou não encontrado."
 			}
@@ -133,7 +138,7 @@ func handleConnectionTCP(conn net.Conn){
 
 		case 2: 
 			//Mostra os sensores ativos
-			showMenu(encoder)
+			showSensors(encoder)
 			
 			//Escolhe qual porta vai fechar
 			questionActuator := Menu {
@@ -163,7 +168,7 @@ func handleConnectionTCP(conn net.Conn){
 	}
 }
 
-func showMenu(encoder *json.Encoder){
+func showSensors(encoder *json.Encoder){
 	currentStatus.Lock()
 	defer currentStatus.Unlock()
 
@@ -175,7 +180,7 @@ func showMenu(encoder *json.Encoder){
 		texto := "----Sensores ativos----\n"	
 
 		for i, v := range currentStatus.verDados {
-			texto += fmt.Sprintf("%d: %s\n", i+1, v.Name)
+			texto += fmt.Sprintf("%d: 📍[%s] %s\n", i+1, v.Id, v.Name)
 		}
 
 		resposta.Texto = texto
@@ -220,7 +225,6 @@ func serverUDP(){
 		//adicionar objeto à lista
 		currentStatus.Lock()
 		sensor.Time = time.Now()
-		fmt.Println("\n--------------\n", sensor.Time)
 
 		find := false
 		for i, item := range currentStatus.verDados{
