@@ -3,7 +3,7 @@ services:
   client:
     build:
       context: .
-      dockerfile: Dockerfile.client
+      dockerfile: dockerfile
     container_name: iot_client
     stdin_open: true
     tty: true

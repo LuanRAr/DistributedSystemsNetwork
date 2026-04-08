@@ -4,7 +4,7 @@ services:
   actuator:
     build:
       context: .
-      dockerfile: Dockerfile.actuator
+      dockerfile: dockerfile
     container_name: iot_actuator
     ports:
       - "8983:8983"
