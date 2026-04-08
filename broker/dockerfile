@@ -1,5 +1,5 @@
 # imagem base
-FROM golang:1.22-alpine
+FROM golang:1.25-alpine
 
 #diretório de trabalho
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 #compilar o binário
-RUN go build -o server main.go
+RUN go build -o server .
 
 #expor portas TCP e UDP
 EXPOSE 4041/tcp
