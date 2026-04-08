@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"sync"
+	"time"
 )
 
 //TCP--------------------------------
@@ -30,7 +31,8 @@ type Object struct{
 	Id string
 	Name string
 	Coordinates []Coords
-	Doors string
+	Door string
+	Time time.Time
 }
 
 type MemoriaSensor struct {
@@ -43,6 +45,7 @@ var currentStatus MemoriaSensor
 
 //SERVER----------------------------------------------------------------------------------
 func main(){
+	go cleanupSensors()
 	go serverUDP()
 	serverTCP()
 	
@@ -98,14 +101,14 @@ func handleConnectionTCP(conn net.Conn){
 			//envia a lista
 			showMenu(encoder)
 			
-			//envia a PERGUNTA como uma nova mensagem JSON
+			//envia a pergunta como uma nova mensagem JSON
 			watchSensor := Menu{Texto: "Digite o número do sensor para ver detalhes:"}
 			encoder.Encode(watchSensor)
 
 			//recebe a escolha do sensor específica deste menu
 			var input2 UserInput
 			if err := decoder.Decode(&input2); err != nil {
-				fmt.Println("Erro ao ler escolha do sensor:", err)
+				fmt.Println("Erro ao ler escolha do usuário:", err)
 				return
 			}
 
@@ -118,7 +121,7 @@ func handleConnectionTCP(conn net.Conn){
 				obj := currentStatus.verDados[index]
 				respostaDetalhe.Texto = fmt.Sprintf(
 					"\n--- Detalhes de: %s ---\nCoordenadas: %+v\nPortas: %s\n", 
-					obj.Name, obj.Coordinates, obj.Doors,
+					obj.Name, obj.Coordinates, obj.Door,
 				)
 			} else {
 				respostaDetalhe.Texto = "\nSensor inválido ou não encontrado."
@@ -216,10 +219,12 @@ func serverUDP(){
 
 		//adicionar objeto à lista
 		currentStatus.Lock()
+		sensor.Time = time.Now()
+		fmt.Println("\n--------------\n", sensor.Time)
 
 		find := false
 		for i, item := range currentStatus.verDados{
-			if item.Name == sensor.Name {
+			if item.Name == sensor.Name{
 				currentStatus.verDados[i] = sensor
 				find = true
 				break 
@@ -235,6 +240,30 @@ func serverUDP(){
 		handleConnectionUDP(remoteAddr, conn, buffer[:n])
 	}
 	
+}
+
+//funcao para limpar a lista com sensores inativos
+func cleanupSensors() {
+	for {
+		time.Sleep(4 * time.Second)
+
+		currentStatus.Lock()
+
+		var ativos []Object
+
+		for _, item := range currentStatus.verDados {
+			//se o sensor mandou dados nos últimos 4 segundos, mantém
+			if time.Since(item.Time) <= 4*time.Second {
+				ativos = append(ativos, item)
+			} else {
+				fmt.Println("Removendo sensor inativo:", item.Name)
+			}
+		}
+
+		currentStatus.verDados = ativos
+
+		currentStatus.Unlock()
+	}
 }
 
 func handleConnectionUDP(remoteAddr *net.UDPAddr, conn *net.UDPConn, data []byte){

@@ -14,9 +14,10 @@ type Coords struct{
 }
 
 type Object struct{
+	Id string
 	Name string
 	Coordinates []Coords
-	Doors string
+	Door string
 }
 
 func main(){
@@ -48,7 +49,6 @@ func main(){
 
 		//enviar mensagem
 		conn.Write(message)
-		fmt.Println("Mensagem enviada")
 
 		//delay de 3 segundos para enviar outro
 		time.Sleep(time.Second * 3)
@@ -67,6 +67,7 @@ func objectData(min float32, max float32) Object{
 	longNumber := fmt.Sprintf("%.2f", randomNumber2)
 
 	object1 := Object {
+		Id: "18253",
 		Name: "SENSOR2",
 		Coordinates: []Coords{
 			{
@@ -74,10 +75,20 @@ func objectData(min float32, max float32) Object{
 			Longitude: longNumber,
 			},
 		},
-		Doors: "Fechada",
+		Door: "Fechada",
 	}
 
+
+	fmt.Printf("📍 [%s] %s | 🌐 (%s, %s) | 🚪 %s\n",
+	object1.Id,
+	object1.Name,
+	object1.Coordinates[0].Latitude,
+	object1.Coordinates[0].Longitude,
+	object1.Door,
+	)
+	
 	return object1
 }
+
 
 
