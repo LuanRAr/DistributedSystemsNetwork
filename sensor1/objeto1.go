@@ -58,7 +58,7 @@ func main(){
 
 func objectData(min float32, max float32) Object{
 
-	//fórmula para numeros aleatórios:
+	//fórmula para numeros aleatórios
 	randomNumber := min + rand.Float32()*(max-min)
 	randomNumber2 := min + rand.Float32()*(max-min) 
 

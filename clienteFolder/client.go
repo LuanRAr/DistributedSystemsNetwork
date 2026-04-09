@@ -49,7 +49,7 @@ func main(){
 		Option: escolha,
 	}
 
-	//Caso apenas resolva mexer no menu
+	//caso apenas resolva mexer no menu
 	switch escolha {
 		case 1:
 			err4 := encoder.Encode(resposta)
@@ -101,7 +101,7 @@ func main(){
 
 			//só continua se NÃO for a mensagem de "vazio"
 			if choose.Texto != "Sem sensores ativos no momento" {
-				// 2. Recebe a pergunta
+				//recebe a pergunta
 				var choose2 Menu
 				decoder.Decode(&choose2)
 				fmt.Println(choose2.Texto)

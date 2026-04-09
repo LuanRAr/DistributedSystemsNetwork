@@ -162,7 +162,7 @@ func handleConnectionTCP(conn net.Conn){
 
 			currentStatus.Unlock()
 
-			// Enviar a confirmação final para o cliente
+			//enviar a confirmação final para o cliente
 			finalMsg := Menu{ Texto: statusMsg }
 			encoder.Encode(finalMsg)
 
@@ -254,7 +254,7 @@ func serverUDP(){
 	
 		currentStatus.Unlock()
 
-		handleConnectionUDP(remoteAddr, conn, buffer[:n])
+		handleConnectionUDP(remoteAddr, conn)
 	}
 	
 }
@@ -270,7 +270,7 @@ func cleanupSensors() {
 		novosAtivos := []Object{}
 
 		for _, item := range currentStatus.verDados {
-			// Verifica se o sensor enviou algo nos últimos 7 segundos
+			//verifica se o sensor enviou algo nos últimos 7 segundos
 			if time.Since(item.Time) <= 7*time.Second {
 				novosAtivos = append(novosAtivos, item)
 			} else {
@@ -285,7 +285,7 @@ func cleanupSensors() {
 	}
 }
 
-func handleConnectionUDP(remoteAddr *net.UDPAddr, conn *net.UDPConn, data []byte){
+func handleConnectionUDP(remoteAddr *net.UDPAddr, conn *net.UDPConn){
 
 	//mensagem respondendo sensor
 	message := "Mensagem recebida!"
