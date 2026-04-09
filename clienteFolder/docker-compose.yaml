@@ -6,9 +6,3 @@ services:
     container_name: iot_client
     stdin_open: true #permite entrada de dados
     tty: true        #emula um terminal
-    networks:
-      - iot_net      #deve ser a mesma rede do broker
-
-networks:
-  iot_net:
-    external: true   # Diz ao Docker que a rede já foi criada pelo broker

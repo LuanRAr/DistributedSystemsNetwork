@@ -13,7 +13,5 @@ RUN go build -o server .
 #expor portas TCP e UDP
 EXPOSE 4041/tcp
 EXPOSE 4042/udp
-EXPOSE 8983/tcp
-
 #rodar aplicação
 CMD ["./server"]

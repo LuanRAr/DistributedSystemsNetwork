@@ -5,7 +5,6 @@ services:
     ports:
       - "4041:4041/tcp"
       - "4042:4042/udp"
-      - "8983:8983/tcp"
     networks:
       - iot_net
 

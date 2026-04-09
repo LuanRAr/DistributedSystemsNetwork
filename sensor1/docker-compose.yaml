@@ -10,9 +10,3 @@ services:
       #nome do container do broker em vez de um IP fixo
       - SERVER_ADDR=iot_server:4042 
     restart: always
-    networks:
-      - iot_net
-
-networks:
-  iot_net:
-    external: true #indica que a rede já foi criada pelo Broker

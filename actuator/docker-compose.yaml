@@ -9,9 +9,3 @@ services:
     ports:
       - "8983:8983"
     restart: always
-    networks:
-      - iot_net Se comunicar com o Broker
-
-networks:
-  iot_net:
-    external: true #indica que a rede já foi criada pelo Broker
