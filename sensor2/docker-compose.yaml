@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: dockerfile
-    container_name: iot_sensor
+    container_name: iot_sensor2
     environment:
       #nome do container do broker em vez de um IP fixo
       - SERVER_ADDR=iot_server:4042 

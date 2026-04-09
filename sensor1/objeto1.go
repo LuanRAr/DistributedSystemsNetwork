@@ -59,8 +59,8 @@ func main(){
 func objectData(min float32, max float32) Object{
 
 	//fórmula para numeros aleatórios:
-	randomNumber := min + rand.Float32()*(max-min) / 100
-	randomNumber2 := min + rand.Float32()*(max-min) / 100
+	randomNumber := min + rand.Float32()*(max-min)
+	randomNumber2 := min + rand.Float32()*(max-min) 
 
 	latNumber := fmt.Sprintf("%.2f", randomNumber)
 	longNumber := fmt.Sprintf("%.2f", randomNumber2)
@@ -74,7 +74,7 @@ func objectData(min float32, max float32) Object{
 			Longitude: longNumber,
 			},
 		},
-		Door: "Fechada",
+		Door: "Aberta",
 	}
 
 	fmt.Printf("📍 [%s] %s | 🌐 (%s, %s) | 🚪 %s\n",

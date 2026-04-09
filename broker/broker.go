@@ -229,6 +229,16 @@ func serverUDP(){
 		currentStatus.Lock()
 		sensor.Time = time.Now()
 
+		//verificação de segurança que aciona atuador pra fechar a porta
+		if sensor.Coordinates[0].Latitude < "0" && sensor.Coordinates[0].Longitude < "0" && sensor.Door == "Aberta" {
+        
+        	//executa em uma goroutine para não travar o recebimento de outros sensores
+			go func(obj Object) {
+				status := sendActuator(obj)
+				fmt.Println("Resultado do Alerta:", status)
+			}(sensor)
+		}
+
 		find := false
 		for i, item := range currentStatus.verDados{
 			if item.Id == sensor.Id{

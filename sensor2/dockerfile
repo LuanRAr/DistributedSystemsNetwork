@@ -1,5 +1,5 @@
 FROM golang:1.25-alpine
 WORKDIR /app
 COPY . .
-RUN go build -o sensor1 objeto1.go
-CMD ["./sensor1"]
+RUN go build -o sensor2 objeto2.go
+CMD ["./sensor2"]
