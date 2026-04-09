@@ -255,20 +255,22 @@ func cleanupSensors() {
 		time.Sleep(7 * time.Second)
 
 		currentStatus.Lock()
-
-		var ativos []Object
+		
+		//Nova fatia vazia para armazenar quem ainda está ativo
+		novosAtivos := []Object{}
 
 		for _, item := range currentStatus.verDados {
-			//se o sensor mandou dados nos últimos 7 segundos, mantém
+			// Verifica se o sensor enviou algo nos últimos 7 segundos
 			if time.Since(item.Time) <= 7*time.Second {
-				ativos = append(ativos, item)
+				novosAtivos = append(novosAtivos, item)
 			} else {
-				fmt.Println("Removendo sensor inativo:", item.Name)
+				fmt.Printf(">>> Removendo sensor inativo: [%s] %s\n", item.Id, item.Name)
 			}
 		}
 
-		currentStatus.verDados = ativos
-
+		//Substitui a lista global pela nova lista (mesmo que vazia)
+		currentStatus.verDados = novosAtivos
+		
 		currentStatus.Unlock()
 	}
 }

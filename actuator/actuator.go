@@ -16,7 +16,7 @@ type Object struct {
 	Id          string
 	Name        string
 	Coordinates []Coords
-	Doors       string
+	Door        string
 }
 
 //-----------------------------------

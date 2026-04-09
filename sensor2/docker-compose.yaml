@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  sensor:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: iot_sensor
+    environment:
+      #nome do container do broker em vez de um IP fixo
+      - SERVER_ADDR=iot_server:4042 
+    restart: always
