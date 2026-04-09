@@ -68,42 +68,25 @@ func main(){
 
 			fmt.Println(respostaBroker.Texto)
 
-			//receber a pergunta: "Digite o número do sensor para ver detalhes:"
+
+			if respostaBroker.Texto != "Sem sensores ativos no momento" {
+			//recebe a pergunta
 			var perguntaSensor Menu
-			errPergunta := decoder.Decode(&perguntaSensor)
-			if errPergunta == nil {
-				fmt.Print(perguntaSensor.Texto)
-			}
+			decoder.Decode(&perguntaSensor)
+			fmt.Print(perguntaSensor.Texto)
 
-			//cliente escolhe o sensor para ver
+			//escolhe o sensor
 			var chooseSensor int
-			_, err6 := fmt.Scan(&chooseSensor)
-			if err6 != nil {
-				fmt.Println("Erro no Scan: ", err6)
-			}
+			fmt.Scan(&chooseSensor)
+			encoder.Encode(UserInput{Option: chooseSensor})
 
-			resposta2 := UserInput{
-				Option: chooseSensor,
-			}
-			
-			//enviar a escolha do sensor específico para o servidor
-			errEnvia := encoder.Encode(resposta2)
-			if errEnvia != nil {
-				fmt.Println("Erro ao enviar escolha:", errEnvia)
-				return
-			}
-
-			//recebe os detalhes do sensor escolhido
+			//recebe detalhes
 			var detalhesSensor Menu
-			errFinal := decoder.Decode(&detalhesSensor)
-			if errFinal != nil {
-				fmt.Println("Erro ao receber detalhes:", errFinal)
-				return
-			}
-
-			//exibe os detalhes na tela
+			decoder.Decode(&detalhesSensor)
 			fmt.Println(detalhesSensor.Texto)
+		}
 
+		
 		case 2:
 			err4 := encoder.Encode(resposta)
 			if err4 != nil {
@@ -116,33 +99,23 @@ func main(){
 			decoder.Decode(&choose)
 			fmt.Println(choose.Texto)
 
-			// broker envia a pergunta
-			var choose2 Menu
-			decoder.Decode(&choose2)
-			fmt.Println(choose2.Texto)
+			//só continua se NÃO for a mensagem de "vazio"
+			if choose.Texto != "Sem sensores ativos no momento" {
+				// 2. Recebe a pergunta
+				var choose2 Menu
+				decoder.Decode(&choose2)
+				fmt.Println(choose2.Texto)
 
-			//escolhe qual porta abrir
-			var chooseDoor int
-			_, errchooseDoor := fmt.Scan(&chooseDoor)
-			if errchooseDoor != nil {
-				fmt.Println("Erro: ", errchooseDoor)
+				//escolhe qual trancar
+				var chooseDoor int
+				fmt.Scan(&chooseDoor)
+				encoder.Encode(UserInput{Option: chooseDoor})
+
+				//recebe confirmação
+				var confirmacao Menu
+				if err := decoder.Decode(&confirmacao); err == nil {
+					fmt.Println("\n>>> " + confirmacao.Texto)
+				}
 			}
-
-			respostaAtuador := UserInput{
-				Option: chooseDoor,
-			}
-
-			//resposta final para o broker
-			encoder.Encode(respostaAtuador)
-
-			//receber a confirmação do trancamento
-			var confirmacao Menu
-			errFinal := decoder.Decode(&confirmacao)
-			if errFinal == nil {
-				fmt.Println("\n>>> " + confirmacao.Texto)
-			} else {
-				fmt.Println("Erro ao receber confirmação final.")
-			}
-
-			}
+		}
 }
