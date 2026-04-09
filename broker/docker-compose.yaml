@@ -1,7 +1,7 @@
 services:
   server:
     build: .
-    container_name: iot_server
+    container_name: broker
     ports:
       - "4041:4041/tcp"
       - "4042:4042/udp"

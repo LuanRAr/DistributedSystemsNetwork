@@ -151,17 +151,20 @@ func handleConnectionTCP(conn net.Conn){
 			decoder.Decode(&clientResponse)
 
 			currentStatus.Lock()
+			var statusMsg string = "Objeto não encontrado."
 
-			for i, item := range currentStatus.verDados{
-				if i+1 == clientResponse.Option {
-					sendActuator(item)
-					fmt.Println("Voce enviou a mensagem pro atuador")
-				} else {
-					fmt.Println("Nao tem")
+			for i, item := range currentStatus.verDados {
+        		if i+1 == clientResponse.Option {
+            		statusMsg = sendActuator(item) // Pega o retorno do atuador
+            		break
 				}
 			}
 
 			currentStatus.Unlock()
+
+			// Enviar a confirmação final para o cliente
+			finalMsg := Menu{ Texto: statusMsg }
+			encoder.Encode(finalMsg)
 
 		default:
 			break
@@ -228,7 +231,7 @@ func serverUDP(){
 
 		find := false
 		for i, item := range currentStatus.verDados{
-			if item.Name == sensor.Name{
+			if item.Id == sensor.Id{
 				currentStatus.verDados[i] = sensor
 				find = true
 				break 
@@ -249,15 +252,15 @@ func serverUDP(){
 //funcao para limpar a lista com sensores inativos
 func cleanupSensors() {
 	for {
-		time.Sleep(4 * time.Second)
+		time.Sleep(7 * time.Second)
 
 		currentStatus.Lock()
 
 		var ativos []Object
 
 		for _, item := range currentStatus.verDados {
-			//se o sensor mandou dados nos últimos 4 segundos, mantém
-			if time.Since(item.Time) <= 4*time.Second {
+			//se o sensor mandou dados nos últimos 7 segundos, mantém
+			if time.Since(item.Time) <= 7*time.Second {
 				ativos = append(ativos, item)
 			} else {
 				fmt.Println("Removendo sensor inativo:", item.Name)
@@ -282,11 +285,11 @@ func handleConnectionUDP(remoteAddr *net.UDPAddr, conn *net.UDPConn, data []byte
 }
 
 //Atuador
-func sendActuator(item Object){
+func sendActuator(item Object) string{
 	conn, err := net.Dial("tcp", ":8983")
 	if err != nil{
 		fmt.Println("Erro:", err)
-		return
+		return "\nErro ao conectar no atuador"
 	}
 
 	defer conn.Close()
@@ -295,5 +298,17 @@ func sendActuator(item Object){
 	encoder := json.NewEncoder(conn)
 
 	encoder.Encode(item)
+
+	//Ler a resposta do atuador
+	var feedback struct {
+		Status string `json:"status"`
+	}
+	decoder := json.NewDecoder(conn)
+	err = decoder.Decode(&feedback)
+	if err != nil {
+		return "\nErro ao receber confirmação do atuador"
+	}
+
+	return feedback.Status
 
 }

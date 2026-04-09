@@ -135,7 +135,14 @@ func main(){
 			//resposta final para o broker
 			encoder.Encode(respostaAtuador)
 
+			//receber a confirmação do trancamento
+			var confirmacao Menu
+			errFinal := decoder.Decode(&confirmacao)
+			if errFinal == nil {
+				fmt.Println("\n>>> " + confirmacao.Texto)
+			} else {
+				fmt.Println("Erro ao receber confirmação final.")
 			}
 
-	
+			}
 }

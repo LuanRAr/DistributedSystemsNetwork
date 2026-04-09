@@ -37,7 +37,7 @@ func main() {
 			continue
 		}
 
-		go handleActuator(conn) // concorrência
+		go handleActuator(conn) //concorrência
 	}
 }
 
@@ -57,5 +57,15 @@ func handleActuator(conn net.Conn) {
 	}
 
 	// Simula ação do atuador
-	fmt.Printf("🔒 Atuador acionado no objeto [%s] - %s\n", sensor.Id, sensor.Name)
+	msg := fmt.Sprintf("🔒 Atuador acionado trancando porta do objeto [%s] - %s", sensor.Id, sensor.Name)
+	fmt.Println(msg)
+
+	//Envia confirmação de volta para o Broker
+	feedback := struct {
+		Status string `json:"status"`
+	}{
+		Status: msg,
+	}
+	encoder := json.NewEncoder(conn)
+	encoder.Encode(feedback)
 }
